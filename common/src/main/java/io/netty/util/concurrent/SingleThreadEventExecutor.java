@@ -370,8 +370,8 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         boolean ranAtLeastOne = false;
 
         do {
-            fetchedAll = fetchFromScheduledTaskQueue();
-            if (runAllTasksFrom(taskQueue)) {
+            fetchedAll = fetchFromScheduledTaskQueue();//拉取定时任务并放入taskQueue队列中
+            if (runAllTasksFrom(taskQueue)) {//执行所有任务
                 ranAtLeastOne = true;
             }
         } while (!fetchedAll); // keep on processing until we fetched all scheduled tasks.
@@ -417,7 +417,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
      * @return {@code true} if at least one task was executed.
      */
     protected final boolean runAllTasksFrom(Queue<Runnable> taskQueue) {
-        Runnable task = pollTaskFrom(taskQueue);
+        Runnable task = pollTaskFrom(taskQueue);//任务执行后移除
         if (task == null) {
             return false;
         }
@@ -454,39 +454,39 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
      * Poll all tasks from the task queue and run them via {@link Runnable#run()} method.  This method stops running
      * the tasks in the task queue and returns if it ran longer than {@code timeoutNanos}.
      */
-    protected boolean runAllTasks(long timeoutNanos) {
-        fetchFromScheduledTaskQueue();
-        Runnable task = pollTask();
+    protected boolean runAllTasks(long timeoutNanos) {//单线程执行任务 ractor线程
+        fetchFromScheduledTaskQueue(); //拉取定时任务并放入taskQueue队列中
+        Runnable task = pollTask();//获取任务
         if (task == null) {
             afterRunningAllTasks();
             return false;
         }
 
-        final long deadline = timeoutNanos > 0 ? getCurrentTimeNanos() + timeoutNanos : 0;
+        final long deadline = timeoutNanos > 0 ? getCurrentTimeNanos() + timeoutNanos : 0;//可以理解为执行周期
         long runTasks = 0;
         long lastExecutionTime;
-        for (;;) {
-            safeExecute(task);
+        for (;;) {//一直循环拉任务执行，当周期到了则跳出，也就是说只执行任务的一部分
+            safeExecute(task);//安全执行任务
 
-            runTasks ++;
+            runTasks ++;//执行任务数统计
 
             // Check timeout every 64 tasks because nanoTime() is relatively expensive.
             // XXX: Hard-coded value - will make it configurable if it is really a problem.
-            if ((runTasks & 0x3F) == 0) {
+            if ((runTasks & 0x3F /*64二进制111111提高效率用的 每64个任务检查一次*/) == 0) {
                 lastExecutionTime = getCurrentTimeNanos();
                 if (lastExecutionTime >= deadline) {
                     break;
                 }
             }
 
-            task = pollTask();
+            task = pollTask();//拉取一个任务
             if (task == null) {
                 lastExecutionTime = getCurrentTimeNanos();
                 break;
             }
         }
 
-        afterRunningAllTasks();
+        afterRunningAllTasks();//钩子函数，其实现其一就是移除执行过的任务
         this.lastExecutionTime = lastExecutionTime;
         return true;
     }

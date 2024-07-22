@@ -136,7 +136,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
     }
 
     @Override
-    protected boolean hasTasks() {
+    protected boolean hasTasks() {//有没有任务在于等待对河和任务队列是否为空，不为空那指定是有任务
         return super.hasTasks() || !tailTasks.isEmpty();
     }
 

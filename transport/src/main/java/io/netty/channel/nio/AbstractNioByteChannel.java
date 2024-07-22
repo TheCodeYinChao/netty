@@ -15,6 +15,8 @@
  */
 package io.netty.channel.nio;
 
+import static io.netty.channel.internal.ChannelUtils.WRITE_STATUS_SNDBUF_FULL;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
@@ -30,12 +32,9 @@ import io.netty.channel.socket.ChannelInputShutdownEvent;
 import io.netty.channel.socket.ChannelInputShutdownReadComplete;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.util.internal.StringUtil;
-
 import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
-
-import static io.netty.channel.internal.ChannelUtils.WRITE_STATUS_SNDBUF_FULL;
 
 /**
  * {@link AbstractNioChannel} base class for {@link Channel}s that operate on bytes.
@@ -132,7 +131,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
         }
 
         @Override
-        public final void read() {
+        public final void read() {//读写消息，赋予bytebuf 然后通过fireChannelRead(...) 传递给pipeline
             final ChannelConfig config = config();
             if (shouldBreakReadReady(config)) {
                 clearReadPending();

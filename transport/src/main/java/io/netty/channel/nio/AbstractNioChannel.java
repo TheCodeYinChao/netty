@@ -190,7 +190,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
     /**
      * Special {@link Unsafe} sub-type which allows to access the underlying {@link SelectableChannel}
      */
-    public interface NioUnsafe extends Unsafe {
+    public interface NioUnsafe extends Unsafe {//channel操作都是通过这进行操作的
         /**
          * Return underlying {@link SelectableChannel}
          */

@@ -20,7 +20,6 @@ import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 final class SelectedSelectionKeySet extends AbstractSet<SelectionKey> {
 
@@ -31,6 +30,13 @@ final class SelectedSelectionKeySet extends AbstractSet<SelectionKey> {
         keys = new SelectionKey[1024];
     }
 
+    /**
+     * 待程序跑过一段时间，等数组的长度足够长，每次在轮询到nio事件的时候，
+     * netty只需要O(1)的时间复杂度就能将 SelectionKey 塞到 set中去，而jdk底层使用的hashSet需要O(lgn)的时间复杂度
+     *
+     * @param o element whose presence in this collection is to be ensured
+     * @return
+     */
     @Override
     public boolean add(SelectionKey o) {
         if (o == null) {
