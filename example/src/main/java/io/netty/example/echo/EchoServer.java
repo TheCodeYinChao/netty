@@ -49,7 +49,7 @@ public final class EchoServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .option(ChannelOption.SO_BACKLOG, 100)
-             .handler(new LoggingHandler(LogLevel.INFO))
+             .handler(new LoggingHandler(LogLevel.INFO)) //表示服务器启动过程中，需要经过哪些流程，打印LoginingHandler
              .childHandler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
@@ -57,7 +57,7 @@ public final class EchoServer {
                      if (sslCtx != null) {
                          p.addLast(sslCtx.newHandler(ch.alloc()));
                      }
-                     //p.addLast(new LoggingHandler(LogLevel.INFO));
+                     //p.addLast(new LoggingHandler(LogLevel.INFO)); //表示客户端连接过程中，经过哪些流程，打印LoginingHandler
                      p.addLast(serverHandler);
                  }
              });

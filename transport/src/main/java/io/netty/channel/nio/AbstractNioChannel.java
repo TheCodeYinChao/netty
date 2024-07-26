@@ -78,10 +78,18 @@ public abstract class AbstractNioChannel extends AbstractChannel {
      */
     protected AbstractNioChannel(Channel parent, SelectableChannel ch, int readInterestOp) {
         super(parent);
-        this.ch = ch;
-        this.readInterestOp = readInterestOp;
+        /**
+         *  jdk 原生编程
+         *    selector = Selector.open();
+         *             socketChannel = ServerSocketChannel.open();
+         *             socketChannel.socket().bind(new InetSocketAddress(port));
+         *             socketChannel.configureBlocking(false);
+         *             socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+         */
+        this.ch = ch; // 设置通道
+        this.readInterestOp = readInterestOp;//设置关注的事件
         try {
-            ch.configureBlocking(false);
+            ch.configureBlocking(false); //设置为非阻塞模式
         } catch (IOException e) {
             try {
                 ch.close();

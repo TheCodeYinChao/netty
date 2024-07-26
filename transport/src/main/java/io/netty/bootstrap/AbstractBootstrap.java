@@ -286,7 +286,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
     private ChannelFuture doBind(final SocketAddress localAddress) {
         final ChannelFuture regFuture = initAndRegister();
-        final Channel channel = regFuture.channel();
+        final Channel channel = regFuture.channel();//SocketChannel
         if (regFuture.cause() != null) {
             return regFuture;
         }
@@ -323,7 +323,16 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     final ChannelFuture initAndRegister() {
         Channel channel = null;
         try {
+            /**
+             * Channel
+             * ChannelConfig
+             * ChannelId
+             * Unsafe
+             * Pipeline
+             * ChannelHander
+             */
             channel = channelFactory.newChannel();
+            // Initialize the Channel.
             init(channel);
         } catch (Throwable t) {
             if (channel != null) {
@@ -335,7 +344,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             // as the Channel is not registered yet we need to force the usage of the GlobalEventExecutor
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
-
+        //调用到 NioEventLoop 中的register() 方法
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {
@@ -373,6 +382,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
         // This method is invoked before channelRegistered() is triggered.  Give user handlers a chance to set up
         // the pipeline in its channelRegistered() implementation.
+        //提交异步task任务 去绑定端口
         channel.eventLoop().execute(new Runnable() {
             @Override
             public void run() {

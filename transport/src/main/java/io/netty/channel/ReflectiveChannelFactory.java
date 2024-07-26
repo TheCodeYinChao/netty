@@ -28,7 +28,7 @@ public class ReflectiveChannelFactory<T extends Channel> implements ChannelFacto
 
     private final Constructor<? extends T> constructor;
 
-    public ReflectiveChannelFactory(Class<? extends T> clazz) {
+    public ReflectiveChannelFactory(Class<? extends T> clazz) { // server端 NioServerSocketChannel   client 端NioSocketChannel
         ObjectUtil.checkNotNull(clazz, "clazz");
         try {
             this.constructor = clazz.getConstructor();
@@ -41,7 +41,7 @@ public class ReflectiveChannelFactory<T extends Channel> implements ChannelFacto
     @Override
     public T newChannel() {
         try {
-            return constructor.newInstance();
+            return constructor.newInstance();//就是实例化一个socketChannel
         } catch (Throwable t) {
             throw new ChannelException("Unable to create Channel from class " + constructor.getDeclaringClass(), t);
         }

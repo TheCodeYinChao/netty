@@ -64,8 +64,8 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
         private final List<Object> readBuf = new ArrayList<Object>();
 
         @Override
-        public void read() {
-            assert eventLoop().inEventLoop();
+        public void read() {//boss reactor 循环处理
+            assert eventLoop().inEventLoop(); //要求必须是reactor线程
             final ChannelConfig config = config();
             final ChannelPipeline pipeline = pipeline();
             final RecvByteBufAllocator.Handle allocHandle = unsafe().recvBufAllocHandle();
